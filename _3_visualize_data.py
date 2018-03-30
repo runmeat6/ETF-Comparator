@@ -10,41 +10,38 @@ snake_case     variables not intended to be used globally and function names
 
 
 from bokeh.plotting import figure, output_file, show
+from bokeh.models import BoxZoomTool, HoverTool, PanTool, ResetTool, SaveTool
 from _2_port_data_to_from_SQL_file import *
 from __file_names import plotFile
 
 
-#get_quotes_from_table(Open)
-#get_quotes_from_table(High)
-#get_quotes_from_table(Low)
+#(indices, dates, bull_1x_prices, bear_1x_prices,
+# bull_3x_prices, bear_3x_prices) = rationalize_quotes_from_table(Open)
+#(indices, dates, bull_1x_prices, bear_1x_prices,
+# bull_3x_prices, bear_3x_prices) = rationalize_quotes_from_table(High)
+#(indices, dates, bull_1x_prices, bear_1x_prices,
+# bull_3x_prices, bear_3x_prices) = rationalize_quotes_from_table(Low)
 (indices, dates, bull_1x_prices, bear_1x_prices,
  bull_3x_prices, bear_3x_prices) = rationalize_quotes_from_table(Close)
 db.close()
 
 output_file(plotFile)
 
-p = figure(plot_width=800, plot_height=400)
+hover = HoverTool( tooltips=[('close value', '$y{$ 0.00}')] )
 
-p.line(x=indices, y=bull_1x_prices)
-#p.line(x=dates, y=bear_1x_prices, line_color='blue')
-#p.line(x=dates, y=bull_3x_prices, line_color='green')
-#p.line(x=dates, y=bear_3x_prices, line_color='red')
+TOOLS = [ hover, BoxZoomTool(), PanTool(), SaveTool(), ResetTool() ]
 
-#hover = HoverTool(
-#    tooltips=[
-#    ("(x,y)", "('@x{%F}', '$@{y}{%0.2f}')"),
-#    ],
-#    formatters={
-#        'x' : 'datetime',   # use 'datetime' formatter for 'date' field
-#        'y' : 'printf',     # use 'printf' formatter for 'adj close' field
-#                            # use default 'numeral' formatter for other fields
-#    },
-#)
+p = figure(title='Comparisons of ETF performance',
+           plot_width=1200, plot_height=600,
+           x_axis_label='close date', y_axis_label='value of $10000 investment (log scale)',
+           x_axis_type='datetime', y_axis_type='log',
+           tools=TOOLS)
 
-#p.multi_line(
-#    xs=[dates, dates, dates, dates],
-#    ys=[bull_1x_prices, bear_1x_prices, bull_3x_prices, bear_3x_prices],
-#    line_color=['black', 'blue', 'green', 'red'],
-#    )
+p.line(x=dates, y=bull_1x_prices, line_color='black', legend='non-leveraged long')
+p.line(x=dates, y=bear_1x_prices, line_color='blue', legend='non-leveraged short')
+p.line(x=dates, y=bull_3x_prices, line_color='green', legend='3x leveraged long')
+p.line(x=dates, y=bear_3x_prices, line_color='red', legend='3x leveraged short')
+
+p.legend.location = 'bottom_left'
 
 show(p)
