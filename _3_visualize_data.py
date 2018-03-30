@@ -31,7 +31,7 @@ hover = HoverTool( tooltips=[('close value', '$y{$ 0.00}')] )
 
 TOOLS = [ hover, BoxZoomTool(), PanTool(), SaveTool(), ResetTool() ]
 
-p = figure(title='Comparisons of ETF performance',
+p = figure(title='Comparisons of ETF performance from ' + plotFile,
            plot_width=1200, plot_height=600,
            x_axis_label='close date', y_axis_label='value of $10000 investment (log scale)',
            x_axis_type='datetime', y_axis_type='log',
